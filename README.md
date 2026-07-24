@@ -1,23 +1,22 @@
 # HelpDesk Flow
 
-![CI](https://github.com/USUARIO/helpdesk-flow/actions/workflows/ci.yml/badge.svg?branch=main)
+![CI](https://github.com/roinerda/SISTEMA-DE-INSIDENCIAS/actions/workflows/ci.yml/badge.svg?branch=main)
 
 Sistema de registro, priorización, atención, validación y cierre de incidencias técnicas.
 Trabajo del curso **ITI-822 Metodologías Ágiles de Desarrollo de Software**, Universidad Técnica Nacional.
-
-> Reemplazar `USUARIO` en la URL del badge por el usuario u organización real de GitHub.
 
 ---
 
 ## Integrantes
 
-| Nombre |  Usuario de GitHub | Rol principal |
-|------|---|
-| Roiner ... |roinerda | | Dominio, transiciones, CI, EXPEDITE |
-| ... | | | Prioridad, consultas, métricas, consola |
+| Nombre | Carné  Usuario de GitHub | Rol principal |
+|---|---|---|
+| Roiner | [roinerda](https://github.com/roinerda) | Dominio, transiciones, CI, EXPEDITE |
+| Brandon Campos | [BrandonCampos](https://github.com/BrandonCampos) | Prioridad, consultas, métricas, consola |
 
 Ambos integrantes participaron en todas las etapas alternando los roles de *driver* y *navigator*
-según la práctica de Ping-Pong TDD descrita más abajo.
+según la práctica de Ping-Pong TDD: un integrante escribe la prueba que falla y el otro implementa
+lo mínimo para hacerla pasar.
 
 ---
 
@@ -32,14 +31,14 @@ forma prioritaria bajo una política de cupo único.
 
 ### Historias implementadas
 
-| ID | Historia |
-|---|---|
-| HU-01 | Registrar una incidencia con validaciones |
-| HU-02 | Cálculo automático de prioridad |
-| HU-03 | Gestión del flujo de estados |
-| HU-04 | Consulta y filtrado de incidencias |
-| HU-05 | Métricas básicas de flujo |
-| HU-06 | Clase de servicio EXPEDITE (cambio de requerimiento) |
+| ID | Historia | Estado |
+|---|---|---|
+| HU-01 | Registrar una incidencia con validaciones | En progreso |
+| HU-02 | Cálculo automático de prioridad | Pendiente |
+| HU-03 | Gestión del flujo de estados | Pendiente |
+| HU-04 | Consulta y filtrado de incidencias | Pendiente |
+| HU-05 | Métricas básicas de flujo | Pendiente |
+| HU-06 | Clase de servicio EXPEDITE (cambio de requerimiento) | Pendiente |
 
 ---
 
@@ -92,7 +91,7 @@ mvn test
 Ejecutar una sola clase de pruebas:
 
 ```bash
-mvn test -Dtest=CalculadoraPrioridadTest
+mvn test -Dtest=IncidenciaTest
 ```
 
 Los reportes quedan en `target/surefire-reports/`.
@@ -120,18 +119,26 @@ src/test/java/cr/utn/helpdesk/     pruebas automatizadas (equivale a /tests)
 ## Decisiones principales de diseño
 
 1. **El cálculo de prioridad no vive en la entidad.** `CalculadoraPrioridad` es una clase sin estado.
-   La prioridad es una regla de negocio que cambió durante el proyecto (EXPEDITE), y aislarla permitió
+   La prioridad es una regla de negocio que cambió durante el proyecto (EXPEDITE), y aislarla permite
    probarla directamente y modificarla sin tocar `Incidencia`.
 
 2. **Las transiciones las decide un validador, no los `setters`.** `ValidadorTransiciones` conoce el
    grafo de estados completo. Evita condicionales dispersos y concentra en un solo lugar las
    restricciones del enunciado (sin saltos, sin retrocesos, sin cierre sin solución).
 
-3. **El repositorio está detrás de una interfaz.** `RepositorioIncidencias` permite que hoy exista una
+3. **Las validaciones viven en el constructor de `Incidencia`.** No existe un instante en que haya
+   una incidencia en estado inválido. La alternativa —un método `validar()` separado— permite
+   construir el objeto roto y olvidarse de invocarlo.
+
+4. **Impacto y urgencia se validan únicamente contra `null`.** Al ser enumeraciones, el compilador ya
+   impide cualquier valor fuera del conjunto declarado. El único caso inválido posible en tiempo de
+   ejecución es la referencia nula; validar otra cosa sería código inalcanzable.
+
+5. **El repositorio está detrás de una interfaz.** `RepositorioIncidencias` permite que hoy exista una
    implementación en memoria y que mañana se agregue persistencia en base de datos sin modificar
    ningún servicio.
 
-4. **La consola no contiene lógica.** `ConsolaHelpDesk` solo lee entrada e imprime salida. Todo lo que
+6. **La consola no contiene lógica.** `ConsolaHelpDesk` solo lee entrada e imprime salida. Todo lo que
    se prueba está fuera de la interfaz, lo que hace posible tener pruebas funcionales sin simular
    entrada de teclado.
 
@@ -143,13 +150,25 @@ El pipeline se ejecuta en cada `push` a `main` y en cada *pull request*. Compila
 la totalidad de las pruebas y falla si alguna no pasa. El estado actual de `main` es el que muestra el
 badge en la parte superior de este documento.
 
+Los reportes de JUnit quedan disponibles como artefacto descargable en cada ejecución, en la pestaña
+Actions del repositorio.
+
 ---
 
 ## Tablero Kanban
 
 Enlace: `PEGAR AQUÍ EL ENLACE DEL TABLERO`
 
-Columnas y límites WIP: Opciones/Backlog · Preparado (3) · En desarrollo (1) · Validación (1) · Hecho.
+| Columna | Límite WIP |
+|---|---|
+| Opciones/Backlog | sin límite |
+| Preparado | 3 |
+| En desarrollo | 1 |
+| Validación | 1 |
+| Hecho | sin límite |
+
+Las tarjetas del tablero son los *issues* del repositorio. Cada una contiene sus criterios de
+aceptación verificables y la definición de hecho.
 
 ---
 
