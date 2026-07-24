@@ -1,0 +1,54 @@
+name: CI
+
+# Requisito 5.3 del enunciado:
+#   - Compila el proyecto
+#   - Ejecuta las pruebas
+#   - Falla cuando una prueba no pasa
+#   - Se ejecuta con cada push o pull request
+#   - Mantiene visible el estado de la rama principal (badge en el README)
+
+on:
+  push:
+    branches:
+      - main
+      - 'feat/**'
+      - 'fix/**'
+      - 'refactor/**'
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    name: Compilar y probar
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar el codigo
+        uses: actions/checkout@v4
+
+      - name: Configurar JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Compilar
+        run: mvn -B --no-transfer-progress compile
+
+      - name: Ejecutar pruebas
+        run: mvn -B --no-transfer-progress test
+
+      - name: Empaquetar
+        run: mvn -B --no-transfer-progress package -DskipTests
+
+      # Deja los reportes de JUnit descargables desde la pestana Actions.
+      # Sirve como evidencia de las pruebas durante la defensa.
+      - name: Publicar reportes de pruebas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reportes-junit
+          path: target/surefire-reports/
+          if-no-files-found: ignore

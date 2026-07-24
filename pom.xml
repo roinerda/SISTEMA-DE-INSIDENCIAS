@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>cr.utn</groupId>
+  <artifactId>helpdesk-flow</artifactId>
+  <version>1.0.0</version>
+  <packaging>jar</packaging>
+
+  <name>HelpDesk Flow</name>
+  <description>Sistema de gestion de incidencias - ITI-822 Metodologias Agiles, UTN</description>
+
+  <properties>
+    <!-- Se compila apuntando a Java 17 aunque el JDK local sea 21 o 25.
+         Asi el proyecto corre en cualquier maquina con JDK 17 o superior,
+         incluida la del docente. -->
+    <maven.compiler.release>17</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <!-- Version fijada a proposito: si se sube, hay que verificar que
+         la CI siga en verde antes de hacer merge a main. -->
+    <junit.version>5.10.2</junit.version>
+    <surefire.version>3.2.5</surefire.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <finalName>helpdesk-flow</finalName>
+    <plugins>
+
+      <!-- Ejecuta las pruebas y hace fallar el build si alguna no pasa.
+           Esto es lo que cumple el requisito 5.3 del enunciado. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${surefire.version}</version>
+      </plugin>
+
+      <!-- Genera un jar ejecutable: java -jar target/helpdesk-flow.jar -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.4.1</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>cr.utn.helpdesk.Main</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </build>
+</project>
