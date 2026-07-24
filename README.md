@@ -11,9 +11,9 @@ Trabajo del curso **ITI-822 Metodologías Ágiles de Desarrollo de Software**, U
 
 ## Integrantes
 
-| Nombre | Carné | Usuario de GitHub | Rol principal |
-|---|---|---|---|
-| Roiner ... | | | Dominio, transiciones, CI, EXPEDITE |
+| Nombre |  Usuario de GitHub | Rol principal |
+|------|---|
+| Roiner ... |roinerda | | Dominio, transiciones, CI, EXPEDITE |
 | ... | | | Prioridad, consultas, métricas, consola |
 
 Ambos integrantes participaron en todas las etapas alternando los roles de *driver* y *navigator*
