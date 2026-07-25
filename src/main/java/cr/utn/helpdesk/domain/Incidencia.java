@@ -80,6 +80,54 @@ public class Incidencia {
         this.descripcionSolucion = null;
     }
 
+    /**
+     * Avanza la incidencia al siguiente estado del flujo.
+     *
+     * Solo admite la transicion consecutiva inmediata y nunca FINALIZADA:
+     * ese estado se alcanza exclusivamente mediante finalizar(), lo que hace
+     * imposible cerrar una incidencia sin solucion.
+     *
+     * @throws IllegalStateException si la transicion es un salto, un retroceso,
+     *         una permanencia en el mismo estado, o un intento de ir a FINALIZADA.
+     */
+    public void avanzarA(Estado nuevo) {
+        if (nuevo == null) {
+            throw new IllegalArgumentException("El estado destino es obligatorio.");
+        }
+        if (nuevo == Estado.FINALIZADA) {
+            throw new IllegalStateException(
+                    "Para finalizar una incidencia use finalizar(descripcionSolucion).");
+        }
+        boolean esConsecutivo = nuevo.ordinal() == this.estado.ordinal() + 1;
+        if (!esConsecutivo) {
+            throw new IllegalStateException(
+                    "Transicion invalida de " + this.estado + " a " + nuevo
+                            + ". El flujo solo permite avanzar al estado siguiente.");
+        }
+        this.estado = nuevo;
+    }
+
+    /**
+     * Finaliza la incidencia. Unico camino valido hacia FINALIZADA.
+     *
+     * @throws IllegalStateException    si la incidencia no esta en EN_VALIDACION.
+     * @throws IllegalArgumentException si la solucion es nula o esta en blanco.
+     */
+    public void finalizar(String descripcionSolucion) {
+        if (this.estado != Estado.EN_VALIDACION) {
+            throw new IllegalStateException(
+                    "Solo se puede finalizar una incidencia que esta en EN_VALIDACION. "
+                            + "Estado actual: " + this.estado + ".");
+        }
+        if (descripcionSolucion == null || descripcionSolucion.isBlank()) {
+            throw new IllegalArgumentException(
+                    "La descripcion de la solucion es obligatoria para finalizar.");
+        }
+        this.descripcionSolucion = descripcionSolucion;
+        this.fechaCierre = LocalDateTime.now();
+        this.estado = Estado.FINALIZADA;
+    }
+
     public String getId() {
         return id;
     }
