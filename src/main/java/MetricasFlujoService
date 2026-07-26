@@ -1,0 +1,85 @@
+package cr.utn.helpdesk;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class MetricasFlujoService {
+
+    private final List<Incidencia> incidencias;
+
+    public MetricasFlujoService(List<Incidencia> incidencias) {
+        this.incidencias = incidencias;
+    }
+
+    public long totalIncidencias() {
+        return incidencias.size();
+    }
+
+    public long cantidadAbiertas() {
+        return incidencias.stream()
+                .filter(i -> i.getEstado() == Estado.ABIERTA)
+                .count();
+    }
+
+    public long cantidadFinalizadas() {
+        return incidencias.stream()
+                .filter(i -> i.getEstado() == Estado.FINALIZADA)
+                .count();
+    }
+
+    /**
+     * Throughput: cantidad de incidencias finalizadas dentro del rango.
+     */
+    public long throughput(LocalDateTime desde, LocalDateTime hasta) {
+        return incidencias.stream()
+                .filter(i -> i.getEstado() == Estado.FINALIZADA)
+                .filter(i -> {
+                    LocalDateTime fin = i.getFechaRegistroFinalizacion();
+                    return fin != null &&
+                           !fin.isBefore(desde) &&
+                           !fin.isAfter(hasta);
+                })
+                .count();
+    }
+
+    /**
+     * Lead time promedio en horas de incidencias finalizadas.
+     */
+    public double leadTimePromedioHoras() {
+        List<Incidencia> finalizadas = incidencias.stream()
+                .filter(i -> i.getEstado() == Estado.FINALIZADA)
+                .toList();
+
+        if (finalizadas.isEmpty()) return 0.0;
+
+        double promedio = finalizadas.stream()
+                .mapToDouble(i -> {
+                    Duration duracion = Duration.between(
+                        i.getFechaRegistro(),
+                        i.getFechaRegistroFinalizacion()
+                    );
+                    return duracion.toHours();
+                })
+                .average()
+                .orElse(0.0);
+
+        return promedio;
+    }
+
+    /**
+     * Conteo de incidencias por prioridad.
+     */
+    public Map<Prioridad, Long> conteoPorPrioridad() {
+        return incidencias.stream()
+                .collect(
+                    Collectors.groupingBy(
+                        Incidencia::getPrioridad,
+                        Collectors.counting()
+                    )
+                );
+    }
+}
