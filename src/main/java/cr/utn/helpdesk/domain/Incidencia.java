@@ -33,6 +33,7 @@ public class Incidencia {
     private final Impacto impacto;
     private final Urgencia urgencia;
     private final Prioridad prioridad;
+    private ClaseServicio claseServicio;
 
     private Estado estado;
     private final LocalDateTime fechaCreacion;
@@ -73,6 +74,7 @@ public class Incidencia {
         this.impacto = impacto;
         this.urgencia = urgencia;
         this.prioridad = CalculadoraPrioridad.calcular(impacto, urgencia);
+        this.claseServicio = ClaseServicio.ESTANDAR;
 
         this.estado = Estado.REGISTRADA;
         this.fechaCreacion = LocalDateTime.now();
@@ -126,6 +128,31 @@ public class Incidencia {
         this.descripcionSolucion = descripcionSolucion;
         this.fechaCierre = LocalDateTime.now();
         this.estado = Estado.FINALIZADA;
+    }
+
+    /**
+     * Marca la incidencia como EXPEDITE (clase de servicio de atencion
+     * prioritaria, HU-06).
+     *
+     * Solo se permite si la prioridad es CRITICA. Esta es la mitad de la
+     * regla que una incidencia puede verificar por si misma; la restriccion
+     * de cupo unico (solo una EXPEDITE activa a la vez) es una regla de
+     * conjunto y vive en GestorExpedite, porque una incidencia no conoce a
+     * las demas.
+     *
+     * @throws IllegalStateException si la incidencia no es CRITICA.
+     */
+    public void marcarComoExpedite() {
+        if (this.prioridad != Prioridad.CRITICA) {
+            throw new IllegalStateException(
+                    "Solo una incidencia CRITICA puede marcarse como EXPEDITE. "
+                            + "Prioridad actual: " + this.prioridad + ".");
+        }
+        this.claseServicio = ClaseServicio.EXPEDITE;
+    }
+
+    public ClaseServicio getClaseServicio() {
+        return claseServicio;
     }
 
     public String getId() {
