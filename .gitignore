@@ -18,3 +18,12 @@ bin/
 Thumbs.db
 
 docs/
+
+# Carpetas de IDE y herramientas
+.idea/
+.claude/
+
+# Documentos de trabajo internos (no son entregables)
+docs/
+TAREA-*.md
+
