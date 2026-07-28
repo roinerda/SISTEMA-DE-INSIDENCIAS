@@ -246,3 +246,24 @@ unitaria y el enunciado no lo exige; la lógica subyacente ya está cubierta.
 **Verificación.** `mvn clean package` en verde con todas las pruebas, y ejecución
 manual del menú recorriendo el flujo completo (registro con prioridad automática,
 avance de estados, marca EXPEDITE, finalización con solución y métricas).
+
+
+## Cambios realizados
+
+Se implementó el menú de consola del sistema.
+
+Incluye:
+- Registro de incidencias.
+- Listado de incidencias.
+- Filtros.
+- Cambio de estado.
+- Consulta de métricas.
+- Manejo de entradas inválidas.
+
+La consola únicamente recibe datos del usuario y delega la lógica a los servicios correspondientes.
+
+## Verificación
+
+- Pruebas ejecutadas correctamente.
+- Código revisado por el integrante del equipo.
+- CI en verde.
