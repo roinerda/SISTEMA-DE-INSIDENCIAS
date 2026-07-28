@@ -1,11 +1,13 @@
 package cr.utn.helpdesk;
 
+import cr.utn.helpdesk.ui.ConsolaHelpDesk;
+import java.util.Scanner;
+
 /**
  * Punto de entrada de HelpDesk Flow.
  *
- * Por decision de diseno esta clase no contiene logica de negocio:
- * unicamente arma las dependencias y arranca la interfaz de consola.
- * Toda la logica probable vive en el paquete {@code service}.
+ * No contiene logica de negocio: solo crea la consola y la arranca.
+ * Toda la logica vive en los paquetes domain y service.
  */
 public final class Main {
 
@@ -14,14 +16,8 @@ public final class Main {
     }
 
     public static void main(String[] args) {
-        System.out.println("=================================");
-        System.out.println("  HelpDesk Flow - UTN ITI-822");
-        System.out.println("=================================");
-        System.out.println("Proyecto base configurado correctamente.");
-
-        // TODO (TEC-03): reemplazar por el arranque real de la consola.
-        //   var repositorio = new RepositorioEnMemoria();
-        //   var servicio    = new ServicioIncidencias(repositorio, new CalculadoraPrioridad());
-        //   new ConsolaHelpDesk(servicio, new ServicioMetricas(repositorio)).iniciar();
+        try (Scanner sc = new Scanner(System.in)) {
+            new ConsolaHelpDesk(sc).iniciar();
+        }
     }
 }
