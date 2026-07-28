@@ -5,14 +5,17 @@
 Sistema de registro, priorización, atención, validación y cierre de incidencias técnicas.
 Trabajo del curso **ITI-822 Metodologías Ágiles de Desarrollo de Software**, Universidad Técnica Nacional.
 
+- **Repositorio:** https://github.com/roinerda/SISTEMA-DE-INSIDENCIAS
+- **Tablero Kanban:** https://github.com/users/roinerda/projects/1
+
 ---
 
 ## Integrantes
 
-| Nombre | Carné  Usuario de GitHub | Rol principal |
+| Nombre  | Usuario de GitHub | Rol principal |
 |---|---|---|
-| Roiner | [roinerda](https://github.com/roinerda) | Dominio, transiciones, CI, EXPEDITE |
-| Brandon Campos | [BrandonCampos](https://github.com/BrandonCampos) | Prioridad, consultas, métricas, consola |
+| Roiner ___________ | _______ | [roinerda](https://github.com/roinerda) | Dominio, transiciones, CI, EXPEDITE |
+| Brandon Campos | _______ | [BrandonCampos](https://github.com/BrandonCampos) | Prioridad, consultas, métricas, consola |
 
 Ambos integrantes participaron en todas las etapas alternando los roles de *driver* y *navigator*
 según la práctica de Ping-Pong TDD: un integrante escribe la prueba que falla y el otro implementa
@@ -27,18 +30,22 @@ partir del impacto y la urgencia, hacerlas avanzar por un flujo de estados contr
 mediante filtros y obtener métricas básicas de flujo (throughput y lead time).
 
 Incorpora además la clase de servicio **EXPEDITE**, que permite atender una incidencia crítica de
-forma prioritaria bajo una política de cupo único.
+forma prioritaria bajo una política de cupo único: solo una incidencia EXPEDITE puede estar en
+desarrollo o validación de forma simultánea.
+
+Es una aplicación de consola escrita en Java, con la lógica de negocio separada de la interfaz y
+cubierta por pruebas automatizadas.
 
 ### Historias implementadas
 
 | ID | Historia | Estado |
 |---|---|---|
-| HU-01 | Registrar una incidencia con validaciones | En progreso |
-| HU-02 | Cálculo automático de prioridad | Pendiente |
-| HU-03 | Gestión del flujo de estados | Pendiente |
-| HU-04 | Consulta y filtrado de incidencias | Pendiente |
-| HU-05 | Métricas básicas de flujo | Pendiente |
-| HU-06 | Clase de servicio EXPEDITE (cambio de requerimiento) | Pendiente |
+| HU-01 | Registrar una incidencia con validaciones | Completada |
+| HU-02 | Cálculo automático de prioridad | Completada |
+| HU-03 | Gestión del flujo de estados | Completada |
+| HU-04 | Consulta y filtrado de incidencias | Completada |
+| HU-05 | Métricas básicas de flujo | Completada |
+| HU-06 | Clase de servicio EXPEDITE (cambio de requerimiento) | Completada |
 
 ---
 
@@ -80,6 +87,9 @@ Ejecutar la aplicación:
 java -jar target/helpdesk-flow.jar
 ```
 
+Al arrancar se muestra un menú de consola con las operaciones del sistema: registrar, listar, buscar,
+filtrar, avanzar estado, finalizar, marcar EXPEDITE y ver métricas.
+
 ---
 
 ## Ejecutar las pruebas
@@ -104,7 +114,6 @@ Los reportes quedan en `target/surefire-reports/`.
 src/main/java/cr/utn/helpdesk/     código fuente (equivale a /src)
 ├── domain/                        entidades y enumeraciones
 ├── service/                       reglas de negocio
-├── repository/                    persistencia
 └── ui/                            interfaz de consola
 src/test/java/cr/utn/helpdesk/     pruebas automatizadas (equivale a /tests)
 .github/workflows/ci.yml           integración continua
@@ -118,29 +127,32 @@ src/test/java/cr/utn/helpdesk/     pruebas automatizadas (equivale a /tests)
 
 ## Decisiones principales de diseño
 
-1. **El cálculo de prioridad no vive en la entidad.** `CalculadoraPrioridad` es una clase sin estado.
-   La prioridad es una regla de negocio que cambió durante el proyecto (EXPEDITE), y aislarla permite
-   probarla directamente y modificarla sin tocar `Incidencia`.
+1. **La prioridad se calcula en el constructor de `Incidencia`.** El enunciado pide que el sistema
+   calcule la prioridad para evitar decisiones arbitrarias. Al calcularla en el constructor, y no
+   ofrecer ningún método para asignarla, resulta imposible fijarla manualmente o crear una incidencia
+   con prioridad incoherente.
 
-2. **Las transiciones las decide un validador, no los `setters`.** `ValidadorTransiciones` conoce el
-   grafo de estados completo. Evita condicionales dispersos y concentra en un solo lugar las
-   restricciones del enunciado (sin saltos, sin retrocesos, sin cierre sin solución).
+2. **Las validaciones viven en el constructor.** No existe un instante en que haya una incidencia en
+   estado inválido. La alternativa —un método `validar()` separado— permitiría construir el objeto
+   roto y olvidarse de invocarlo.
 
-3. **Las validaciones viven en el constructor de `Incidencia`.** No existe un instante en que haya
-   una incidencia en estado inválido. La alternativa —un método `validar()` separado— permite
-   construir el objeto roto y olvidarse de invocarlo.
+3. **Impacto y urgencia se validan solo contra `null`.** Al ser enumeraciones, el compilador impide
+   cualquier valor fuera del conjunto declarado; el único caso inválido posible en ejecución es la
+   referencia nula.
 
-4. **Impacto y urgencia se validan únicamente contra `null`.** Al ser enumeraciones, el compilador ya
-   impide cualquier valor fuera del conjunto declarado. El único caso inválido posible en tiempo de
-   ejecución es la referencia nula; validar otra cosa sería código inalcanzable.
+4. **La incidencia gobierna su propio ciclo de vida (HU-03).** Los métodos `avanzarA` y `finalizar`
+   viven en `Incidencia`. `avanzarA` solo permite el estado consecutivo y nunca FINALIZADA: ese estado
+   se alcanza únicamente con `finalizar`, que exige la descripción de la solución, haciendo imposible
+   por diseño cerrar una incidencia sin solución.
 
-5. **El repositorio está detrás de una interfaz.** `RepositorioIncidencias` permite que hoy exista una
-   implementación en memoria y que mañana se agregue persistencia en base de datos sin modificar
-   ningún servicio.
+5. **La regla de EXPEDITE está dividida según la información que necesita (HU-06).** "Solo una crítica
+   puede ser EXPEDITE" vive en `Incidencia`, que conoce su prioridad. "Solo una EXPEDITE activa a la
+   vez" vive en `GestorExpedite`, porque es una regla sobre el conjunto de incidencias. El gestor
+   verifica el cupo y delega la transición en el `avanzarA` ya probado, sin reimplementarlo.
 
-6. **La consola no contiene lógica.** `ConsolaHelpDesk` solo lee entrada e imprime salida. Todo lo que
-   se prueba está fuera de la interfaz, lo que hace posible tener pruebas funcionales sin simular
-   entrada de teclado.
+6. **La consola no contiene lógica de negocio.** `ConsolaHelpDesk` (paquete `ui`) solo lee entrada,
+   la valida mínimamente e invoca a los servicios. Toda la lógica probable está en `domain` y
+   `service`, cubierta por las pruebas automatizadas.
 
 ---
 
@@ -148,16 +160,14 @@ src/test/java/cr/utn/helpdesk/     pruebas automatizadas (equivale a /tests)
 
 El pipeline se ejecuta en cada `push` a `main` y en cada *pull request*. Compila el proyecto, ejecuta
 la totalidad de las pruebas y falla si alguna no pasa. El estado actual de `main` es el que muestra el
-badge en la parte superior de este documento.
-
-Los reportes de JUnit quedan disponibles como artefacto descargable en cada ejecución, en la pestaña
-Actions del repositorio.
+badge en la parte superior de este documento. Los reportes de JUnit quedan disponibles como artefacto
+descargable en cada ejecución, en la pestaña Actions del repositorio.
 
 ---
 
 ## Tablero Kanban
 
-Enlace: `PEGAR AQUÍ EL ENLACE DEL TABLERO`
+Enlace: https://github.com/users/roinerda/projects/1
 
 | Columna | Límite WIP |
 |---|---|
@@ -168,7 +178,7 @@ Enlace: `PEGAR AQUÍ EL ENLACE DEL TABLERO`
 | Hecho | sin límite |
 
 Las tarjetas del tablero son los *issues* del repositorio. Cada una contiene sus criterios de
-aceptación verificables y la definición de hecho.
+aceptación verificables y su definición de hecho.
 
 ---
 
