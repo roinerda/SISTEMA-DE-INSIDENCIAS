@@ -14,8 +14,8 @@ Trabajo del curso **ITI-822 Metodologías Ágiles de Desarrollo de Software**, U
 
 | Nombre  | Usuario de GitHub | Rol principal |
 |---|---|---|
-| Roiner ___________ | _______ | [roinerda](https://github.com/roinerda) | Dominio, transiciones, CI, EXPEDITE |
-| Brandon Campos | _______ | [BrandonCampos](https://github.com/BrandonCampos) | Prioridad, consultas, métricas, consola |
+| Roiner | [roinerda](https://github.com/roinerda) | Dominio, transiciones, CI, EXPEDITE |
+| Brandon Campos  | [BrandonCampos](https://github.com/BrandonCampos) | Prioridad, consultas, métricas, consola |
 
 Ambos integrantes participaron en todas las etapas alternando los roles de *driver* y *navigator*
 según la práctica de Ping-Pong TDD: un integrante escribe la prueba que falla y el otro implementa
