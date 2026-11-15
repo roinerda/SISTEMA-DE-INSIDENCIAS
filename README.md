@@ -1,5 +1,11 @@
 # HelpDesk Flow
 
+<!-- local-development:start -->
+## Desarrollo local
+
+Consulta [RUNNING.md](RUNNING.md) para ubicar cada componente, abrirlo en su IDE, compilarlo y conocer las comprobaciones realizadas y los requisitos pendientes.
+<!-- local-development:end -->
+
 ![CI](https://github.com/roinerda/SISTEMA-DE-INSIDENCIAS/actions/workflows/ci.yml/badge.svg?branch=main)
 
 Sistema de registro, priorización, atención, validación y cierre de incidencias técnicas.
