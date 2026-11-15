@@ -1,5 +1,11 @@
 # HelpDesk Flow
 
+<!-- local-development:start -->
+## Desarrollo local
+
+Consulta [RUNNING.md](RUNNING.md) para ubicar cada componente, abrirlo en su IDE, compilarlo y conocer las comprobaciones realizadas y los requisitos pendientes.
+<!-- local-development:end -->
+
 ![CI](https://github.com/roinerda/SISTEMA-DE-INSIDENCIAS/actions/workflows/ci.yml/badge.svg?branch=main)
 
 Sistema de registro, priorización, atención, validación y cierre de incidencias técnicas.
@@ -190,3 +196,25 @@ aceptación verificables y su definición de hecho.
 | `RETROSPECTIVA.md` | Retrospectiva de la pareja |
 | `REFACTORING.md` | Refactorizaciones realizadas y pruebas que las protegieron |
 | `CONTRIBUTING.md` | Convenciones de ramas, commits y revisión |
+
+<!-- build-repairs-20261115:start -->
+## Reparación y comprobación — 2026-11-15
+
+- Se documentaron los comandos de compilación y comprobación con Maven/JDK 24 y se conservaron los cambios previos de README y exclusiones.
+
+Comprobado:
+
+- Maven package terminó correctamente para `pom.xml`.
+- Maven: [INFO] Tests run: 78, Failures: 0, Errors: 0, Skipped: 0
+
+Comandos:
+
+```powershell
+mvn -f "pom.xml" package
+```
+
+Alcance pendiente:
+
+- Compilar y ejecutar la suite disponible no demuestra todos los flujos gráficos, de datos o de instalación.
+
+<!-- build-repairs-20261115:end -->
